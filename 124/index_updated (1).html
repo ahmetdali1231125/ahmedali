@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تشفير وفك التشفير</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; direction: rtl; }
+        .container { margin-top: 50px; }
+        input, button { margin: 10px; padding: 10px; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>أحمد علي</h1>
+    <div class="container">
+        <h3>توليد التشفير</h3>
+        <input type="text" id="textInput" placeholder="أدخل النص هنا">
+        <button onclick="encodeText()">تشفير</button>
+        <p id="encodedText"></p>
+        <button id="copyButton" style="display:none;" onclick="copyText()">نسخ</button>
+
+        <h3>فك الشفرة</h3>
+        <input type="text" id="encodedInput" placeholder="أدخل النص المشفر">
+        <button onclick="decodeText()">فك التشفير</button>
+        <p id="decodedText"></p>
+    </div>
+
+    <script>
+        const secretMap = {};
+        const usedNumbers = new Set();
+
+        function getRandomNumber() {
+            let num;
+            do { num = Math.floor(Math.random() * 900) + 100; } while (usedNumbers.has(num));
+            usedNumbers.add(num);
+            return num;
+        }
+
+        function encodeText() {
+            let input = document.getElementById("textInput").value;
+            let encoded = input.split('').map(char => {
+                if (!secretMap[char]) {
+                    secretMap[char] = getRandomNumber();
+                }
+                return secretMap[char];
+            }).join(' ');
+            document.getElementById("encodedText").innerText = "النص المشفر: " + encoded;
+            document.getElementById("copyButton").style.display = "inline-block";
+        }
+
+        function decodeText() {
+            let input = document.getElementById("encodedInput").value.split(' ');
+            let reversedMap = Object.fromEntries(Object.entries(secretMap).map(([key, value]) => [value, key]));
+            let decoded = input.map(num => reversedMap[num] || '?').join('');
+            document.getElementById("decodedText").innerText = "النص المفكوك: " + decoded;
+        }
+
+        function copyText() {
+            const text = document.getElementById("encodedText").innerText.replace("النص المشفر: ", "");
+            navigator.clipboard.writeText(text).then(() => {
+                alert("تم نسخ النص المشفر!");
+            }).catch(err => {
+                console.error("فشل النسخ: ", err);
+            });
+        }
+    </script>
+</body>
+</html>
